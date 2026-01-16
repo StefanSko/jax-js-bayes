@@ -1,0 +1,94 @@
+# Agent Instructions for jax-js-bayes
+
+## Project Overview
+
+jax-js-bayes is a declarative Bayesian modeling library for jax-js.
+It provides a TypeScript DSL for defining probabilistic models.
+
+## Dependencies
+
+This library depends on:
+- **@jax-js/jax** - Array operations, autodiff
+- **jax-js-mcmc** - HMC sampling (see companion repo)
+
+Clone references:
+
+```bash
+git clone https://github.com/ekzhang/jax-js.git /tmp/jax-js
+git clone https://github.com/StefanSko/jax-js-mcmc.git /tmp/jax-js-mcmc
+```
+
+## Development Workflow
+
+### TDD for Distributions and Constraints
+
+Each distribution/constraint is developed test-first:
+
+1. Write logProb test against analytical formula
+2. Write sample test checking mean/std
+3. Implement distribution
+4. Tests pass
+
+For constraints, also test:
+- transform/inverse roundtrip
+- logDetJacobian against numerical differentiation
+
+### Integration Testing
+
+After unit tests pass, run posteriordb integration tests:
+
+```bash
+pnpm test tests/posteriordb
+```
+
+These compare against reference posteriors. Must pass before merge.
+
+## Key Design Decisions
+
+### Complete vs Predictive
+
+The only type-level workflow enforcement. Keep it simple:
+
+```typescript
+type BoundModel<S extends "complete" | "predictive"> = { ... }
+```
+
+Don't add more workflow states - users manage their own workflow.
+
+### Functional Composition
+
+No special workflow functions. Just:
+- `model.simulate(params)` - generate data
+- `model.samplePrior()` - draw from prior
+- `model.bind(data)` - bind data
+
+Users compose these as needed.
+
+### Observable Plot for Viz
+
+Viz is optional. If user hasn't installed @observablehq/plot,
+throw helpful error pointing to install command.
+
+## Test Commands
+
+```bash
+# Unit tests
+pnpm test tests/distributions
+pnpm test tests/constraints
+
+# Integration tests
+pnpm test tests/posteriordb
+
+# All tests
+pnpm test
+
+# Browser tests
+pnpm test:browser
+```
+
+## Code Style
+
+- TypeScript strict mode
+- Pure functions
+- Match jax-js conventions
+- Keep API surface small
