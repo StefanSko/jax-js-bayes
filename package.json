@@ -1,0 +1,46 @@
+{
+  "name": "jax-js-bayes",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./distributions": {
+      "types": "./dist/distributions/index.d.ts",
+      "import": "./dist/distributions/index.js"
+    },
+    "./constraints": {
+      "types": "./dist/constraints/index.d.ts",
+      "import": "./dist/constraints/index.js"
+    }
+  },
+  "dependencies": {
+    "jax-js-mcmc": "file:/tmp/jax-js-mcmc"
+  },
+  "peerDependencies": {
+    "@jax-js/jax": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@observablehq/plot": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@jax-js/jax": "^0.1.5",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:distributions": "vitest run tests/distributions",
+    "test:constraints": "vitest run tests/constraints",
+    "test:posteriordb": "vitest run tests/posteriordb"
+  }
+}
