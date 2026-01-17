@@ -13,7 +13,7 @@ export function normal(loc: ArrayLike, scale: ArrayLike): Distribution {
       const scaleArr = asArray(scale);
       const z = x.sub(locArr).div(scaleArr.ref);
       const logScale = np.log(scaleArr);
-      return z.pow(2).mul(-0.5).sub(logScale).sub(LOG_SQRT_2PI);
+      return np.square(z).mul(-0.5).sub(logScale).sub(LOG_SQRT_2PI);
     },
     sample(key: JaxArray, shape: number[] = []) {
       const locArr = asArray(loc);

@@ -9,7 +9,7 @@ export function exponential(rate: ArrayLike): Distribution {
     logProb(x: JaxArray) {
       const rateArr = asArray(rate);
       const logRate = np.log(rateArr.ref);
-      const scaled = rateArr.mul(x);
+      const scaled = rateArr.mul(x.ref);
       const base = logRate.sub(scaled);
       const mask = np.greaterEqual(x, 0);
       return np.where(mask, base, -Infinity);

@@ -11,7 +11,7 @@ export function uniform(low: ArrayLike, high: ArrayLike): Distribution {
       const highArr = asArray(high);
       const range = highArr.ref.sub(lowArr.ref);
       const logRange = np.log(range);
-      const lowerOk = np.greaterEqual(x, lowArr);
+      const lowerOk = np.greaterEqual(x.ref, lowArr);
       const upperOk = np.lessEqual(x, highArr);
       const inside = np.where(lowerOk, upperOk, false);
       return np.where(inside, logRange.mul(-1), -Infinity);

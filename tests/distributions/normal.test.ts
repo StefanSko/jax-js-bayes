@@ -16,7 +16,7 @@ describe("normal", () => {
   test("samples have correct mean and std", () => {
     const dist = normal(2, 3);
     const draws = dist.sample(random.key(0), [5000]);
-    const mean = np.mean(draws).item();
+    const mean = np.mean(draws.ref).item();
     const std = np.std(draws).item();
     expect(mean).toBeCloseTo(2, 1);
     expect(std).toBeCloseTo(3, 1);

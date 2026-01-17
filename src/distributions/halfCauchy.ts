@@ -9,8 +9,8 @@ export function halfCauchy(scale: ArrayLike): Distribution {
   return {
     logProb(x: JaxArray) {
       const scaleArr = asArray(scale);
-      const z = x.div(scaleArr.ref);
-      const logDenom = np.log1p(z.pow(2));
+      const z = x.ref.div(scaleArr.ref);
+      const logDenom = np.log1p(np.square(z));
       const logScale = np.log(scaleArr);
       const base = logDenom.add(logScale).add(Math.log(Math.PI)).mul(-1);
       const mask = np.greater(x, 0);
