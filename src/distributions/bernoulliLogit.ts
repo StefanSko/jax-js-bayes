@@ -32,10 +32,11 @@ export function bernoulliLogit(logit: number | Array): Distribution {
       return np.sum(logProbPerPoint);
     },
 
-    sample(key: Array, shape: number[] = []): Array {
+    sample(key: Array, shape?: number[]): Array {
       // p = sigmoid(logit) = 1 / (1 + exp(-logit))
       const p = np.array(1).div(np.exp(logitArr.ref.mul(-1)).add(1));
-      const samples = random.bernoulli(key, p, shape);
+      const sampleShape = shape ?? logitArr.shape;
+      const samples = random.bernoulli(key, p, sampleShape);
       return np.where(samples, np.array(1), np.array(0));
     },
 

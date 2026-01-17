@@ -119,6 +119,14 @@ export function model<Spec extends ModelSpec>(spec: Spec): Model<Spec> {
         boundData[key] = value instanceof Array ? value : np.array(value as number[]);
       }
 
+      const missingData = dataNames.filter((name) => !(name in boundData));
+      if (missingData.length > 0) {
+        throw new Error(
+          `Missing data for: ${missingData.join(", ")}. ` +
+            "Provide all data specs before binding.",
+        );
+      }
+
       // Check if all observed variables have data
       const hasAllObserved = observedNames.every((name) => name in boundData);
       const state = hasAllObserved ? "complete" : "predictive";
@@ -219,7 +227,7 @@ export function model<Spec extends ModelSpec>(spec: Spec): Model<Spec> {
         const paramSpec = spec[name] as ParamSpec;
 
         // Determine shape
-        let shape: number[] = [];
+        let shape: number[] | undefined;
         if (paramSpec.shape) {
           if (typeof paramSpec.shape === "string") {
             // Named dimension
@@ -275,7 +283,7 @@ export function model<Spec extends ModelSpec>(spec: Spec): Model<Spec> {
         const observedSpec = spec[name] as ObservedSpec;
 
         // Determine shape for this observed variable
-        let shape: number[] = [];
+        let shape: number[] | undefined;
         const dimSize = dims[name];
         if (dimSize !== undefined) {
           shape = [dimSize];

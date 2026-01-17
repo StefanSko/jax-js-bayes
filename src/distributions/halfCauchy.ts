@@ -31,11 +31,12 @@ export function halfCauchy(scale: number | Array): Distribution {
       return np.sum(logProbPerPoint);
     },
 
-    sample(key: Array, shape: number[] = []): Array {
+    sample(key: Array, shape?: number[]): Array {
       // Use inverse CDF sampling for Cauchy
       // Cauchy: x = scale * tan(π * (u - 0.5))
       // Half-Cauchy: |x|
-      const z = random.cauchy(key, shape);
+      const sampleShape = shape ?? scaleArr.shape;
+      const z = random.cauchy(key, sampleShape);
       return np.abs(z.mul(scaleArr.ref));
     },
 

@@ -73,6 +73,32 @@ describe("model DSL", () => {
       expect(bound.logProb).toBeDefined();
     });
 
+    test("bind throws when required data is missing", () => {
+      const m = model({
+        x: data(),
+        y: observed(({ x }) => normal(x, 1)),
+      });
+
+      expect(() =>
+        m.bind({
+          y: [1, 2, 3],
+        }),
+      ).toThrow("Missing data");
+    });
+
+    test("predictive binding works with covariates only", () => {
+      const m = model({
+        x: data(),
+        y: observed(({ x }) => normal(x, 1)),
+      });
+
+      const bound = m.bind({
+        x: [1, 2, 3],
+      });
+
+      expect(bound.state).toBe("predictive");
+    });
+
     test("logProb returns scalar Array", () => {
       const m = model({
         mu: param(normal(0, 10)),

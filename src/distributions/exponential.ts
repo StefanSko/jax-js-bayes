@@ -19,9 +19,10 @@ export function exponential(rate: number | Array): Distribution {
       return np.sum(logProbPerPoint);
     },
 
-    sample(key: Array, shape: number[] = []): Array {
+    sample(key: Array, shape?: number[]): Array {
       // Exponential(rate) = Exponential(1) / rate
-      const z = random.exponential(key, shape);
+      const sampleShape = shape ?? rateArr.shape;
+      const z = random.exponential(key, sampleShape);
       return z.div(rateArr.ref);
     },
 

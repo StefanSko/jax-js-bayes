@@ -31,8 +31,9 @@ export function normal(
       return np.sum(logProbPerPoint);
     },
 
-    sample(key: Array, shape: number[] = []): Array {
-      const z = random.normal(key, shape);
+    sample(key: Array, shape?: number[]): Array {
+      const sampleShape = shape ?? np.broadcastShapes(locArr.shape, scaleArr.shape);
+      const z = random.normal(key, sampleShape);
       return z.mul(scaleArr.ref).add(locArr.ref);
     },
 

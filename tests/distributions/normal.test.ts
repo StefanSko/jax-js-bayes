@@ -46,6 +46,16 @@ describe("normal distribution", () => {
     expect(std).toBeCloseTo(scale, 0);
   });
 
+  test("samples default to parameter shape for array params", () => {
+    const loc = np.array([0, 1, 2]);
+    const scale = np.array([1, 1, 1]);
+    const d = normal(loc, scale);
+    const key = random.key(0);
+    const samples = d.sample(key);
+
+    expect(np.shape(samples)).toEqual([3]);
+  });
+
   test("support is real", () => {
     const d = normal(0, 1);
     expect(d.support).toEqual({ type: "real" });

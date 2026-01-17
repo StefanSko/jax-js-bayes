@@ -23,9 +23,10 @@ export function bernoulli(p: number | Array): Distribution {
       return np.sum(logProbPerPoint);
     },
 
-    sample(key: Array, shape: number[] = []): Array {
+    sample(key: Array, shape?: number[]): Array {
       // random.bernoulli returns boolean, convert to float for consistency
-      const samples = random.bernoulli(key, pArr.ref, shape);
+      const sampleShape = shape ?? pArr.shape;
+      const samples = random.bernoulli(key, pArr.ref, sampleShape);
       return np.where(samples, np.array(1), np.array(0));
     },
 

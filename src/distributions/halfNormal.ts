@@ -30,8 +30,9 @@ export function halfNormal(scale: number | Array): Distribution {
       return np.sum(logProbPerPoint);
     },
 
-    sample(key: Array, shape: number[] = []): Array {
-      const z = random.normal(key, shape);
+    sample(key: Array, shape?: number[]): Array {
+      const sampleShape = shape ?? scaleArr.shape;
+      const z = random.normal(key, sampleShape);
       return np.abs(z.mul(scaleArr.ref));
     },
 
