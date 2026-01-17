@@ -41,6 +41,16 @@ export interface BoundModel<State extends "complete" | "predictive"> {
   logProb: (params: JsTree<Array>) => Array;
   initialParams: () => JsTree<Array>;
   paramNames: string[];
+  /**
+   * Sample from the prior distributions of all parameters.
+   * Returns parameters in unconstrained space (suitable for HMC).
+   */
+  samplePrior: (key: Array) => JsTree<Array>;
+  /**
+   * Generate simulated observations given parameter values.
+   * Parameters should be in unconstrained space.
+   */
+  simulate: (params: JsTree<Array>, key: Array) => Record<string, Array>;
 }
 
 type HasAllObserved<Spec extends ModelSpec, D extends Record<string, any>> = {

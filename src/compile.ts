@@ -1,4 +1,4 @@
-import { numpy as np, tree, type Array, type JsTree } from "@jax-js/jax";
+import { numpy as np, random, tree, type Array, type JsTree } from "@jax-js/jax";
 import {
   PARAM,
   DATA,
@@ -147,10 +147,90 @@ export function compile<Spec extends ModelSpec>(
     return params;
   }
 
+  function samplePrior(key: Array): JsTree<Array> {
+    const params: Record<string, Array> = {};
+    let currentKey = key;
+
+    for (const name of paramNames) {
+      const fieldSpec = spec[name] as ParamSpec;
+      let shape: number[] = [];
+
+      if (typeof fieldSpec.shape === "string") {
+        const dataName = fieldSpec.shape;
+        if (dataName in boundData) {
+          shape = [boundData[dataName].shape[0]];
+        }
+      } else if (Array.isArray(fieldSpec.shape)) {
+        shape = fieldSpec.shape;
+      }
+
+      const [paramKey, nextKey] = random.split(currentKey);
+      currentKey = nextKey;
+
+      // Sample from prior in constrained space
+      const constrainedSample = fieldSpec.prior.sample(paramKey, shape);
+
+      // Transform to unconstrained space if needed
+      if (fieldSpec.constraint) {
+        params[name] = fieldSpec.constraint.inverse(constrainedSample);
+      } else {
+        params[name] = constrainedSample;
+      }
+    }
+    return params;
+  }
+
+  function simulate(params: JsTree<Array>, key: Array): Record<string, Array> {
+    const flatParams = params as Record<string, Array>;
+    const context: Record<string, Array> = { ...boundData };
+
+    // Transform parameters to constrained space
+    for (const name of paramNames) {
+      const fieldSpec = spec[name] as ParamSpec;
+      let paramValue = flatParams[name];
+
+      if (fieldSpec.constraint) {
+        paramValue = fieldSpec.constraint.transform(paramValue.ref);
+      }
+
+      context[name] = paramValue;
+    }
+
+    // Compute derived quantities
+    for (const [name, derivedFn] of derivedFields) {
+      const derivedContext = buildContext(context);
+      context[name] = derivedFn(derivedContext);
+    }
+
+    // Sample from observed distributions
+    const simulated: Record<string, Array> = {};
+    let currentKey = key;
+
+    for (const [name, obsSpec] of observedFields) {
+      const [obsKey, nextKey] = random.split(currentKey);
+      currentKey = nextKey;
+
+      const obsContext = buildContext(context);
+      const distribution = obsSpec.distribution(obsContext);
+
+      // Determine shape from bound data if available
+      let shape: number[] = [];
+      if (name in boundData) {
+        shape = boundData[name].shape;
+      }
+
+      simulated[name] = distribution.sample(obsKey, shape);
+    }
+
+    return simulated;
+  }
+
   return {
     state: state as "complete" | "predictive",
     logProb,
     initialParams,
     paramNames,
+    samplePrior,
+    simulate,
   };
 }

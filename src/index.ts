@@ -11,3 +11,4 @@ export {
 export type { Distribution } from "./distributions";
 export { positive, bounded } from "./constraints";
 export type { Constraint } from "./constraints";
+export { take } from "./utils";
