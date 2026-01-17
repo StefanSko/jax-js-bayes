@@ -56,6 +56,15 @@ pnpm test tests/posteriordb
 
 Must pass before merge. See `docs/DESIGN.md` for the 11 target models.
 
+### Early Validation: posteriordb smoke test
+
+Run a single light posteriordb model early in development as soon as the
+DSL + compile path works.
+
+- Recommended model: Eight Schools (noncentered)
+- Suggested HMC config: `numSamples: 100`, `numWarmup: 100`, `numChains: 1`, `key: randomKey(0)`
+- Goal: regression signal with loose tolerances, not full posterior precision
+
 ## Key Design Decisions
 
 ### Complete vs Predictive

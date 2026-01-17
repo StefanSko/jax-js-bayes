@@ -423,6 +423,19 @@ describe("eight schools", () => {
 });
 ```
 
+### Early Validation (Smoke Tests)
+
+Run a small posteriordb model early and often while building the library.
+Pick a simple model (e.g. Radon Pooled or Kidscore Mom IQ) and keep the test
+lightweight (fewer samples, fewer chains) so it can run during development.
+Once the pipeline is stable, add the full reference configurations for the
+remaining models.
+
+Recommended smoke test:
+- Model: Eight Schools (noncentered)
+- Suggested HMC config: `numSamples: 100`, `numWarmup: 100`, `numChains: 1`, `key: randomKey(0)`
+- Goal: regression signal with loose tolerances, not full posterior precision
+
 ### Test Matrix: 11 posteriordb Models
 
 | Model | Distributions | Constraints | Validates |
@@ -563,14 +576,15 @@ pnpm test:browser
 
 ## Implementation Order
 
-1. **Model DSL** - `model()`, `param()`, `observed()`, `data()`
-2. **Distributions** - Normal, HalfNormal, HalfCauchy, Exponential, Uniform, Bernoulli
-3. **Constraints** - Positive, Bounded
-4. **Compilation** - Model → logProb function
-5. **Binding** - Complete/Predictive type distinction
-6. **Simulation** - `samplePrior()`, `simulate()`
-7. **posteriordb tests** - Validate against references
-8. **Visualizations** - Observable Plot wrappers
+1. **Walking skeleton** - minimal DSL + compile path (`model()`, `param()`, `observed()`, `data()`) and `logProb`
+2. **Core distributions/constraints** - just enough for one simple posteriordb model
+3. **Early posteriordb smoke test** - Eight Schools (noncentered) with `numSamples: 100`, `numWarmup: 100`, `numChains: 1`
+4. **Expand DSL + compilation** - shapes, derived quantities, indexing, broadcasting
+5. **Complete v1 distributions/constraints** - cover the 11-model matrix
+6. **Binding** - Complete/Predictive type distinction
+7. **Simulation** - `samplePrior()`, `simulate()`
+8. **Full posteriordb suite** - validate against reference configs
+9. **Visualizations** - Observable Plot wrappers
 
 ## Future (v2+)
 
