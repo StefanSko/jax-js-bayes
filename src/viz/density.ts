@@ -20,7 +20,10 @@ export function densityPlot(
     const key = opts.priorKey ?? random.key(0);
     const priorDraws = opts.prior.sample(key, [1024]).js() as number[];
     marks.push(
-      Plot.line(priorDraws, Plot.binX({ y: "count" }, { x: (d: number) => d, stroke: "orange" })),
+      Plot.rectY(
+        priorDraws,
+        Plot.binX({ y: "count" }, { x: (d: number) => d, fill: "orange", opacity: 0.3 }),
+      ),
     );
   }
 
