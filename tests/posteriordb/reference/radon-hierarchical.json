@@ -1,0 +1,6 @@
+{
+  "mu_alpha": { "mean": 1.46, "sd": 0.30 },
+  "sigma_alpha": { "mean": 0.32, "sd": 0.20 },
+  "beta": { "mean": -0.68, "sd": 0.15 },
+  "sigma": { "mean": 0.76, "sd": 0.07 }
+}
