@@ -16,7 +16,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "jax-js-mcmc": "^0.1.0"
+    "jax-js-mcmc": "github:StefanSko/jax-js-mcmc"
   },
   "peerDependencies": {
     "@jax-js/jax": ">=0.1.0",
