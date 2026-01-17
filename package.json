@@ -1,0 +1,36 @@
+{
+  "name": "jax-js-bayes",
+  "version": "0.1.0",
+  "description": "Declarative Bayesian modeling library for jax-js",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./distributions": "./src/distributions/index.ts",
+    "./constraints": "./src/constraints/index.ts",
+    "./viz": "./src/viz/index.ts"
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:browser": "vitest --browser",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "jax-js-mcmc": "github:StefanSko/jax-js-mcmc"
+  },
+  "peerDependencies": {
+    "@jax-js/jax": ">=0.1.0",
+    "@observablehq/plot": ">=0.6"
+  },
+  "peerDependenciesMeta": {
+    "@observablehq/plot": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@observablehq/plot": "^0.6.0",
+    "@types/node": "^20.12.7",
+    "typescript": "~5.9.3",
+    "vitest": "^1.0.0"
+  }
+}
