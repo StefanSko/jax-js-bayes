@@ -17,7 +17,7 @@ The library was developed through:
   - Columbia (PR comparison)
   - Yokohama (merge plan)
   - Hong Kong (final deployment)
-- **15 total sessions** (9 Claude Code + 6 Codex)
+- **17 total sessions** (9 Claude Code + 8 Codex)
 
 From concept to validated library with 11 posteriordb reference tests passing in ~48 hours of wall-clock time.
 
@@ -116,6 +116,14 @@ After 4 competing implementations, consolidation and review:
 
 #### Yokohama Worktree (Strategic Planning)
 
+**[Codex: Jan 18 #2](https://gistpreview.github.io/?9c45453f499fc095a55137a85c1fc4e6/index.html)** *(10:01-10:10 UTC)*
+- 4 prompts, 1 page, 676 KB session
+- Initial PR analysis
+
+**[Codex: Jan 18 #3](https://gistpreview.github.io/?96ad577fee5fc04bf945c9fd3307bac6/index.html)** *(10:02-10:03 UTC)*
+- 1 prompt, 1 page, 394 KB session
+- Continued analysis
+
 **[Claude Code: Yokohama-v1](https://gisthost.github.io/?aa1ca2b6775e41ccd1dbb3526bfe2987/index.html)** *(13:51-13:55 UTC)*
 - 12 prompts, 3 pages, 12 KB session
 - **Created merge plan for main branch**
@@ -172,7 +180,7 @@ gantt
 
 ![Activity Timeline](timeline_activity_jan2026.png)
 
-*Visualization shows activity across all 15 sessions (9 Claude Code + 6 Codex). Total: 12,588 events.*
+*Visualization shows activity across all 17 sessions (9 Claude Code + 8 Codex). Total: 14,664 events.*
 
 ---
 
@@ -228,8 +236,8 @@ gantt
   - PR #3 (Edinburgh): 2,710 additions
   - PR #4 (Dakar): 2,833 additions
   - PR #5 (Washington): 1,843 additions ✅ **MERGED**
-- **Total sessions:** 15 (9 Claude Code + 6 Codex)
-- **Total events:** 12,588 tool calls and interactions
+- **Total sessions:** 17 (9 Claude Code + 8 Codex)
+- **Total events:** 14,664 tool calls and interactions
 
 ---
 
@@ -309,6 +317,8 @@ Parallel use of both agents:
 |---------|----------|----------|------------|
 | Columbia | PR Comparison | 7h 4min | [gist](https://gisthost.github.io/?2e2ccfac8aaded0b281e5f07848f6197/index.html) |
 | Codex Jan 18 #1 | Review | 3h 37min | [gist](https://gistpreview.github.io/?95d937f5b48a9244dc407b9809917df4/index.html) |
+| Yokohama Codex #1 | PR Analysis | 9min | [gist](https://gistpreview.github.io/?9c45453f499fc095a55137a85c1fc4e6/index.html) |
+| Yokohama Codex #2 | Continued Analysis | 1min | [gist](https://gistpreview.github.io/?96ad577fee5fc04bf945c9fd3307bac6/index.html) |
 | Yokohama-v1 | **Merge Plan** | 5min | [gist](https://gisthost.github.io/?aa1ca2b6775e41ccd1dbb3526bfe2987/index.html) |
 
 ### Phase 3: Deployment
