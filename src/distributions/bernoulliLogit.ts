@@ -19,7 +19,8 @@ export function bernoulliLogit(logits: ArrayLike): Distribution {
       return sumToScalar(logp);
     },
     sample(key: JaxArray, shape: number[] = []): JaxArray {
-      const probs = nn.sigmoid(logits);
+      const logitsArr = toArray(logits);
+      const probs = nn.sigmoid(logitsArr);
       return random.bernoulli(key, probs, shape);
     },
   };

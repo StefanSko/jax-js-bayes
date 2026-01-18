@@ -15,7 +15,8 @@ export function bernoulli(p: ArrayLike): Distribution {
       return sumToScalar(logp);
     },
     sample(key: JaxArray, shape: number[] = []): JaxArray {
-      return random.bernoulli(key, p, shape);
+      const pArr = toArray(p);
+      return random.bernoulli(key, pArr, shape);
     },
   };
 }

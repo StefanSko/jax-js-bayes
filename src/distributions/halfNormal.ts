@@ -24,7 +24,8 @@ export function halfNormal(scale: ArrayLike): Distribution {
       return sumToScalar(masked);
     },
     sample(key: JaxArray, shape: number[] = []): JaxArray {
-      return np.absolute(random.normal(key, shape)).mul(scale);
+      const scaleArr = toArray(scale);
+      return np.absolute(random.normal(key, shape)).mul(scaleArr);
     },
   };
 }

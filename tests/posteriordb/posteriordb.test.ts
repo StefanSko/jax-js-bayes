@@ -25,7 +25,7 @@ const HMC_CONFIG = {
 
 describe("posteriordb", () => {
   const eightStats = loadMeanStats("eight_schools-eight_schools_noncentered");
-  (eightStats ? test : test.skip)("eight schools noncentered", async () => {
+  test("eight schools noncentered", async () => {
     const data = loadData("eight_schools");
     const bound = eightSchoolsNoncentered.bind({
       y: np.array(data.y as number[]),
@@ -46,14 +46,14 @@ describe("posteriordb", () => {
     const muMean = drawMean(result.draws.mu);
     const tauMean = drawMean(result.draws.tau);
 
-    const muRef = eightStats!.mean_value[eightStats!.names.indexOf("mu")];
-    const tauRef = eightStats!.mean_value[eightStats!.names.indexOf("tau")];
+    const muRef = eightStats.mean_value[eightStats.names.indexOf("mu")];
+    const tauRef = eightStats.mean_value[eightStats.names.indexOf("tau")];
 
     expectMeanClose("mu", muMean, muRef);
     expectMeanClose("tau", tauMean, tauRef);
   });
 
-  (eightStats ? test : test.skip)("eight schools centered", async () => {
+  test("eight schools centered", async () => {
     const data = loadData("eight_schools");
     const bound = eightSchoolsCentered.bind({
       y: np.array(data.y as number[]),
@@ -74,15 +74,15 @@ describe("posteriordb", () => {
     const muMean = drawMean(result.draws.mu);
     const tauMean = drawMean(result.draws.tau);
 
-    const muRef = eightStats!.mean_value[eightStats!.names.indexOf("mu")];
-    const tauRef = eightStats!.mean_value[eightStats!.names.indexOf("tau")];
+    const muRef = eightStats.mean_value[eightStats.names.indexOf("mu")];
+    const tauRef = eightStats.mean_value[eightStats.names.indexOf("tau")];
 
     expectMeanClose("mu", muMean, muRef);
     expectMeanClose("tau", tauMean, tauRef);
   });
 
   const kidiqStats = loadMeanStats("kidiq-kidscore_momiq");
-  (kidiqStats ? test : test.skip)("kidscore momiq", async () => {
+  test("kidscore momiq", async () => {
     const data = loadData("kidiq");
     const bound = kidscoreMomiq.bind({
       mom_iq: np.array(data.mom_iq as number[]),
@@ -104,9 +104,9 @@ describe("posteriordb", () => {
     const beta1Mean = drawMean(result.draws.beta1);
     const sigmaMean = drawMean(result.draws.sigma);
 
-    const beta0Ref = kidiqStats!.mean_value[kidiqStats!.names.indexOf("beta[1]")];
-    const beta1Ref = kidiqStats!.mean_value[kidiqStats!.names.indexOf("beta[2]")];
-    const sigmaRef = kidiqStats!.mean_value[kidiqStats!.names.indexOf("sigma")];
+    const beta0Ref = kidiqStats.mean_value[kidiqStats.names.indexOf("beta[1]")];
+    const beta1Ref = kidiqStats.mean_value[kidiqStats.names.indexOf("beta[2]")];
+    const sigmaRef = kidiqStats.mean_value[kidiqStats.names.indexOf("sigma")];
 
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
@@ -114,7 +114,7 @@ describe("posteriordb", () => {
   });
 
   const kidiqInteractionStats = loadMeanStats("kidiq-kidscore_interaction");
-  (kidiqInteractionStats ? test : test.skip)("kidscore interaction", async () => {
+  test("kidscore interaction", async () => {
     const data = loadData("kidiq");
     const bound = kidscoreInteraction.bind({
       mom_hs: np.array(data.mom_hs as number[]),
@@ -141,11 +141,16 @@ describe("posteriordb", () => {
     const beta3Mean = drawMean(result.draws.beta3);
     const sigmaMean = drawMean(result.draws.sigma);
 
-    const beta0Ref = kidiqInteractionStats!.mean_value[kidiqInteractionStats!.names.indexOf("beta[1]")];
-    const beta1Ref = kidiqInteractionStats!.mean_value[kidiqInteractionStats!.names.indexOf("beta[2]")];
-    const beta2Ref = kidiqInteractionStats!.mean_value[kidiqInteractionStats!.names.indexOf("beta[3]")];
-    const beta3Ref = kidiqInteractionStats!.mean_value[kidiqInteractionStats!.names.indexOf("beta[4]")];
-    const sigmaRef = kidiqInteractionStats!.mean_value[kidiqInteractionStats!.names.indexOf("sigma")];
+    const beta0Ref =
+      kidiqInteractionStats.mean_value[kidiqInteractionStats.names.indexOf("beta[1]")];
+    const beta1Ref =
+      kidiqInteractionStats.mean_value[kidiqInteractionStats.names.indexOf("beta[2]")];
+    const beta2Ref =
+      kidiqInteractionStats.mean_value[kidiqInteractionStats.names.indexOf("beta[3]")];
+    const beta3Ref =
+      kidiqInteractionStats.mean_value[kidiqInteractionStats.names.indexOf("beta[4]")];
+    const sigmaRef =
+      kidiqInteractionStats.mean_value[kidiqInteractionStats.names.indexOf("sigma")];
 
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
@@ -155,7 +160,7 @@ describe("posteriordb", () => {
   });
 
   const blrStats = loadMeanStats("sblrc-blr");
-  (blrStats ? test : test.skip)("blr", async () => {
+  test("blr", async () => {
     const data = loadData("sblrc");
     const bound = blr.bind({
       X: np.array(data.X as number[][]),
@@ -175,15 +180,15 @@ describe("posteriordb", () => {
     const beta1Mean = drawMean(np.take(result.draws.beta, 0, -1));
     const sigmaMean = drawMean(result.draws.sigma);
 
-    const beta1Ref = blrStats!.mean_value[blrStats!.names.indexOf("beta[1]")];
-    const sigmaRef = blrStats!.mean_value[blrStats!.names.indexOf("sigma")];
+    const beta1Ref = blrStats.mean_value[blrStats.names.indexOf("beta[1]")];
+    const sigmaRef = blrStats.mean_value[blrStats.names.indexOf("sigma")];
 
     expectMeanClose("beta[1]", beta1Mean, beta1Ref);
     expectMeanClose("sigma", sigmaMean, sigmaRef);
   });
 
   const logearnStats = loadMeanStats("earnings-logearn_height");
-  (logearnStats ? test : test.skip)("logearn height", async () => {
+  test("logearn height", async () => {
     const data = loadData("earnings");
     const bound = logearnHeight.bind({
       height: np.array(data.height as number[]),
@@ -205,9 +210,9 @@ describe("posteriordb", () => {
     const beta1Mean = drawMean(result.draws.beta1);
     const sigmaMean = drawMean(result.draws.sigma);
 
-    const beta0Ref = logearnStats!.mean_value[logearnStats!.names.indexOf("beta[1]")];
-    const beta1Ref = logearnStats!.mean_value[logearnStats!.names.indexOf("beta[2]")];
-    const sigmaRef = logearnStats!.mean_value[logearnStats!.names.indexOf("sigma")];
+    const beta0Ref = logearnStats.mean_value[logearnStats.names.indexOf("beta[1]")];
+    const beta1Ref = logearnStats.mean_value[logearnStats.names.indexOf("beta[2]")];
+    const sigmaRef = logearnStats.mean_value[logearnStats.names.indexOf("sigma")];
 
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
@@ -215,7 +220,7 @@ describe("posteriordb", () => {
   });
 
   const earnStats = loadMeanStats("earnings-earn_height");
-  (earnStats ? test : test.skip)("earn height", async () => {
+  test("earn height", async () => {
     const data = loadData("earnings");
     const bound = earnHeight.bind({
       height: np.array(data.height as number[]),
@@ -237,9 +242,9 @@ describe("posteriordb", () => {
     const beta1Mean = drawMean(result.draws.beta1);
     const sigmaMean = drawMean(result.draws.sigma);
 
-    const beta0Ref = earnStats!.mean_value[earnStats!.names.indexOf("beta[1]")];
-    const beta1Ref = earnStats!.mean_value[earnStats!.names.indexOf("beta[2]")];
-    const sigmaRef = earnStats!.mean_value[earnStats!.names.indexOf("sigma")];
+    const beta0Ref = earnStats.mean_value[earnStats.names.indexOf("beta[1]")];
+    const beta1Ref = earnStats.mean_value[earnStats.names.indexOf("beta[2]")];
+    const sigmaRef = earnStats.mean_value[earnStats.names.indexOf("sigma")];
 
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
@@ -247,7 +252,7 @@ describe("posteriordb", () => {
   });
 
   const mesquiteStats = loadMeanStats("mesquite-logmesquite_logvolume");
-  (mesquiteStats ? test : test.skip)("mesquite logvolume", async () => {
+  test("mesquite logvolume", async () => {
     const data = loadData("mesquite");
     const bound = mesquiteLogVolume.bind({
       K: 2,
@@ -271,9 +276,9 @@ describe("posteriordb", () => {
     const beta1Mean = drawMean(np.take(result.draws.beta, 1, -1));
     const sigmaMean = drawMean(result.draws.sigma);
 
-    const beta0Ref = mesquiteStats!.mean_value[mesquiteStats!.names.indexOf("beta[1]")];
-    const beta1Ref = mesquiteStats!.mean_value[mesquiteStats!.names.indexOf("beta[2]")];
-    const sigmaRef = mesquiteStats!.mean_value[mesquiteStats!.names.indexOf("sigma")];
+    const beta0Ref = mesquiteStats.mean_value[mesquiteStats.names.indexOf("beta[1]")];
+    const beta1Ref = mesquiteStats.mean_value[mesquiteStats.names.indexOf("beta[2]")];
+    const sigmaRef = mesquiteStats.mean_value[mesquiteStats.names.indexOf("sigma")];
 
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
@@ -281,7 +286,7 @@ describe("posteriordb", () => {
   });
 
   const radonStats = loadMeanStats("radon_all-radon_pooled");
-  (radonStats ? test : test.skip)("radon pooled", async () => {
+  test("radon pooled", async () => {
     const data = loadData("radon_all");
     const bound = radonPooled.bind({
       floor_measure: np.array(data.floor_measure as number[]),
@@ -303,9 +308,9 @@ describe("posteriordb", () => {
     const betaMean = drawMean(result.draws.beta);
     const sigmaMean = drawMean(result.draws.sigma_y);
 
-    const alphaRef = radonStats!.mean_value[radonStats!.names.indexOf("alpha")];
-    const betaRef = radonStats!.mean_value[radonStats!.names.indexOf("beta")];
-    const sigmaRef = radonStats!.mean_value[radonStats!.names.indexOf("sigma_y")];
+    const alphaRef = radonStats.mean_value[radonStats.names.indexOf("alpha")];
+    const betaRef = radonStats.mean_value[radonStats.names.indexOf("beta")];
+    const sigmaRef = radonStats.mean_value[radonStats.names.indexOf("sigma_y")];
 
     expectMeanClose("alpha", alphaMean, alphaRef);
     expectMeanClose("beta", betaMean, betaRef);
@@ -313,7 +318,7 @@ describe("posteriordb", () => {
   });
 
   const radonHierStats = loadMeanStats("radon_mn-radon_hierarchical_intercept_noncentered");
-  (radonHierStats ? test : test.skip)("radon hierarchical", async () => {
+  test("radon hierarchical", async () => {
     const data = loadData("radon_mn");
     const countyIdx = (data.county_idx as number[]).map((value) => value - 1);
     const bound = radonHierarchical.bind({
@@ -342,9 +347,9 @@ describe("posteriordb", () => {
     const sigmaAlphaMean = drawMean(result.draws.sigma_alpha);
     const sigmaYMean = drawMean(result.draws.sigma_y);
 
-    const muAlphaRef = radonHierStats!.mean_value[radonHierStats!.names.indexOf("mu_alpha")];
-    const sigmaAlphaRef = radonHierStats!.mean_value[radonHierStats!.names.indexOf("sigma_alpha")];
-    const sigmaYRef = radonHierStats!.mean_value[radonHierStats!.names.indexOf("sigma_y")];
+    const muAlphaRef = radonHierStats.mean_value[radonHierStats.names.indexOf("mu_alpha")];
+    const sigmaAlphaRef = radonHierStats.mean_value[radonHierStats.names.indexOf("sigma_alpha")];
+    const sigmaYRef = radonHierStats.mean_value[radonHierStats.names.indexOf("sigma_y")];
 
     expectMeanClose("mu_alpha", muAlphaMean, muAlphaRef);
     expectMeanClose("sigma_alpha", sigmaAlphaMean, sigmaAlphaRef);
@@ -352,7 +357,7 @@ describe("posteriordb", () => {
   });
 
   const wellsStats = loadMeanStats("wells_data-wells_dist");
-  (wellsStats ? test : test.skip)("wells distance", async () => {
+  test("wells distance", async () => {
     const data = loadData("wells_data");
     const bound = wellsDist.bind({
       dist: np.array(data.dist as number[]),
@@ -372,8 +377,8 @@ describe("posteriordb", () => {
     const beta0Mean = drawMean(result.draws.beta0);
     const beta1Mean = drawMean(result.draws.beta1);
 
-    const beta0Ref = wellsStats!.mean_value[wellsStats!.names.indexOf("beta[1]")];
-    const beta1Ref = wellsStats!.mean_value[wellsStats!.names.indexOf("beta[2]")];
+    const beta0Ref = wellsStats.mean_value[wellsStats.names.indexOf("beta[1]")];
+    const beta1Ref = wellsStats.mean_value[wellsStats.names.indexOf("beta[2]")];
 
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);

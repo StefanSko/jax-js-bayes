@@ -16,7 +16,8 @@ export function exponential(rate: ArrayLike): Distribution {
       return sumToScalar(masked);
     },
     sample(key: JaxArray, shape: number[] = []): JaxArray {
-      return random.exponential(key, shape).div(rate);
+      const rateArr = toArray(rate);
+      return random.exponential(key, shape).div(rateArr);
     },
   };
 }

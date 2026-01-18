@@ -4,7 +4,7 @@
   "type": "module",
   "license": "MIT",
   "dependencies": {
-    "jax-js-mcmc": "^0.1.0"
+    "jax-js-mcmc": "github:StefanSko/jax-js-mcmc"
   },
   "peerDependencies": {
     "@jax-js/jax": ">=0.1.0",
@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "adm-zip": "^0.5.12",
+    "@types/node": "^20.12.7",
     "typescript": "^5.4.0",
     "vitest": "^1.6.0"
   },
@@ -26,5 +27,16 @@
     "test:distributions": "vitest run tests/distributions",
     "test:constraints": "vitest run tests/constraints",
     "test:posteriordb": "vitest run tests/posteriordb"
+  },
+  "pnpm": {
+    "packageExtensions": {
+      "jax-js-mcmc@*": {
+        "exports": {
+          ".": "./src/index.ts"
+        },
+        "main": "./src/index.ts",
+        "module": "./src/index.ts"
+      }
+    }
   }
 }

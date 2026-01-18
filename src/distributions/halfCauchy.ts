@@ -24,7 +24,8 @@ export function halfCauchy(scale: ArrayLike): Distribution {
       return sumToScalar(masked);
     },
     sample(key: JaxArray, shape: number[] = []): JaxArray {
-      return np.absolute(random.cauchy(key, shape)).mul(scale);
+      const scaleArr = toArray(scale);
+      return np.absolute(random.cauchy(key, shape)).mul(scaleArr);
     },
   };
 }

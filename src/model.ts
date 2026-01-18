@@ -1,4 +1,4 @@
-import { random, Array as JaxArray } from "@jax-js/jax";
+import { numpy as np, random, Array as JaxArray } from "@jax-js/jax";
 import type {
   Constraint,
   Distribution,
@@ -35,19 +35,46 @@ export type DerivedNode = {
   fn: (ctx: ModelContext) => JaxArray;
 };
 
-export type ModelSpec = Record<string, ParamNode | DataNode | ObservedNode | DerivedNode | ((ctx: ModelContext) => JaxArray)>;
+export type ModelSpec = Record<
+  string,
+  | ParamNode
+  | DataNode
+  | ObservedNode
+  | DerivedNode
+  | ((ctx: ModelContext) => JaxArray)
+>;
 
 export type BoundKind = "complete" | "predictive";
 
-export type BoundModel<S extends BoundKind = BoundKind> = {
+type DataKeys<Spec extends ModelSpec> = {
+  [K in keyof Spec]: Spec[K] extends DataNode ? K : never;
+}[keyof Spec];
+
+type ObservedKeys<Spec extends ModelSpec> = {
+  [K in keyof Spec]: Spec[K] extends ObservedNode ? K : never;
+}[keyof Spec];
+
+type BindInput<Spec extends ModelSpec> = Record<DataKeys<Spec>, unknown> &
+  Partial<Record<ObservedKeys<Spec>, unknown>>;
+
+type HasAllObserved<Spec extends ModelSpec, D extends Record<string, unknown>> =
+  [ObservedKeys<Spec>] extends [never]
+    ? true
+    : Exclude<ObservedKeys<Spec>, keyof D> extends never
+      ? true
+      : false;
+
+export type BoundModel<S extends BoundKind> = {
   kind: S;
-  logProb: (params: Record<string, unknown>) => JaxArray;
+  logProb: S extends "complete" ? (params: Record<string, unknown>) => JaxArray : never;
   samplePrior: (opts: { key: JaxArray }) => Record<string, JaxArray>;
   simulate: (params: Record<string, unknown>, opts: { key: JaxArray }) => Record<string, JaxArray>;
 };
 
-export type Model = {
-  bind: (data: Record<string, unknown>) => BoundModel;
+export type Model<Spec extends ModelSpec = ModelSpec> = {
+  bind: <D extends BindInput<Spec>>(
+    data: D,
+  ) => BoundModel<HasAllObserved<Spec, D> extends true ? "complete" : "predictive">;
   samplePrior: (opts: { key: JaxArray; data?: Record<string, unknown> }) => Record<string, JaxArray>;
   simulate: (params: Record<string, unknown>, opts: { key: JaxArray; data?: Record<string, unknown> }) => Record<string, JaxArray>;
 };
@@ -89,6 +116,13 @@ function makeContextProxy(ctx: ModelContext): ModelContext {
       return value as any;
     },
   });
+}
+
+function splitKeys(key: JaxArray, count: number): JaxArray[] {
+  if (count <= 0) return [];
+  if (count === 1) return [key];
+  const keys = random.split(key, count);
+  return np.split(keys, count, 0).map((part) => part.reshape([2]));
 }
 
 function buildModelDefinition(spec: ModelSpec) {
@@ -151,7 +185,7 @@ function samplePriorInternal(
   key: JaxArray,
 ): Record<string, JaxArray> {
   const names = Object.keys(params);
-  const keys = random.split(key, names.length) as JaxArray[];
+  const keys = splitKeys(key, names.length);
   const ctx: ModelContext = {};
   const ctxProxy = makeContextProxy(ctx);
   const samples: Record<string, JaxArray> = {};
@@ -192,7 +226,7 @@ function simulateInternal(
   }
 
   const observedNames = Object.keys(def.observed);
-  const keys = random.split(key, observedNames.length) as JaxArray[];
+  const keys = splitKeys(key, observedNames.length);
   const result: Record<string, JaxArray> = { ...dataValues };
 
   observedNames.forEach((name, idx) => {
@@ -207,41 +241,61 @@ function simulateInternal(
   return result;
 }
 
-export function model(spec: ModelSpec): Model {
+export function model<Spec extends ModelSpec>(spec: Spec): Model<Spec> {
   const { def, dataNodes, observedNodes, params } = buildModelDefinition(spec);
 
-  function bind(dataInput: Record<string, unknown>): BoundModel {
+  function bind<D extends BindInput<Spec>>(
+    dataInput: D,
+  ): BoundModel<HasAllObserved<Spec, D> extends true ? "complete" : "predictive"> {
+    const dataLookup = dataInput as Record<string, unknown>;
     const dataValues: Record<string, JaxArray> = {};
     const observedValues: Record<string, JaxArray> = {};
 
     for (const [name, node] of Object.entries(dataNodes)) {
-      if (!(name in dataInput)) {
+      if (!(name in dataLookup)) {
         throw new Error(`Missing data '${name}'`);
       }
-      const value = toArray(dataInput[name]);
+      const value = toArray(dataLookup[name]);
       dataValues[name] = value;
     }
 
-    for (const name of Object.keys(observedNodes)) {
-      if (name in dataInput) {
-        observedValues[name] = toArray(dataInput[name]);
-      }
+    const observedNames = Object.keys(observedNodes);
+    const providedObserved = observedNames.filter((name) => name in dataLookup);
+    if (providedObserved.length > 0 && providedObserved.length < observedNames.length) {
+      throw new Error(
+        "Partial observed data provided. Supply all observed values for a complete model, or none for predictive.",
+      );
+    }
+    for (const name of providedObserved) {
+      observedValues[name] = toArray(dataLookup[name]);
     }
 
     const dims = buildDimsFromData(dataNodes, dataValues);
     const boundData = { ...dataValues, ...observedValues };
-    const provided = new Set(Object.keys(observedValues));
-
-    const logProb = compileLogProb(def, boundData, provided);
     const kind: BoundKind =
-      Object.keys(observedNodes).length === provided.size ? "complete" : "predictive";
+      observedNames.length === providedObserved.length ? "complete" : "predictive";
 
-    return {
+    if (kind === "complete") {
+      const logProb = compileLogProb(def, boundData, new Set(providedObserved));
+      const complete = {
+        kind,
+        logProb,
+        samplePrior: ({ key }) => samplePriorInternal(params, dims, key),
+        simulate: (paramsInput, opts) => simulateInternal(def, paramsInput, dataValues, opts.key),
+      } as BoundModel<"complete">;
+      return complete as BoundModel<
+        HasAllObserved<Spec, D> extends true ? "complete" : "predictive"
+      >;
+    }
+
+    const predictive = {
       kind,
-      logProb,
       samplePrior: ({ key }) => samplePriorInternal(params, dims, key),
       simulate: (paramsInput, opts) => simulateInternal(def, paramsInput, dataValues, opts.key),
-    };
+    } as BoundModel<"predictive">;
+    return predictive as BoundModel<
+      HasAllObserved<Spec, D> extends true ? "complete" : "predictive"
+    >;
   }
 
   function samplePrior({ key, data: dataInput = {} }: { key: JaxArray; data?: Record<string, unknown> }) {

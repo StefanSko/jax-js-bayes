@@ -21,7 +21,9 @@ export function normal(loc: ArrayLike, scale: ArrayLike): Distribution {
       return sumToScalar(logp);
     },
     sample(key: JaxArray, shape: number[] = []): JaxArray {
-      return random.normal(key, shape).mul(scale).add(loc);
+      const locArr = toArray(loc);
+      const scaleArr = toArray(scale);
+      return random.normal(key, shape).mul(scaleArr).add(locArr);
     },
   };
 }

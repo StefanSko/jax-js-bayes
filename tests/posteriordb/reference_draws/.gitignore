@@ -1,0 +1,3 @@
+# Compiled Stan models (generated during reference draw creation)
+wells_dist
+*.stan

@@ -20,7 +20,10 @@ export function uniform(low: ArrayLike, high: ArrayLike): Distribution {
       return sumToScalar(masked);
     },
     sample(key: JaxArray, shape: number[] = []): JaxArray {
-      return random.uniform(key, shape).mul(np.subtract(high, low)).add(low);
+      const lowArr = toArray(low);
+      const highArr = toArray(high);
+      const range = highArr.ref.sub(lowArr.ref);
+      return random.uniform(key, shape).mul(range).add(lowArr.ref);
     },
   };
 }
