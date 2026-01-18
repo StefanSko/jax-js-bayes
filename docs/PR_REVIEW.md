@@ -3,12 +3,13 @@
 **Date:** 2026-01-18
 **Reviewer:** Claude Opus 4.5
 **Target:** docs/DESIGN.md specification with posteriordb validation
+**Cross-referenced:** yokohama-v1 workspace review
 
 ---
 
 ## Executive Summary
 
-Four open PRs implement the jax-js-bayes library. All target the same DESIGN.md specification but differ significantly in completeness and validation coverage. **PR #5 (washington)** is recommended for merge due to complete posteriordb coverage. **PR #3 (codex)** has a critical gap: no posteriordb tests.
+Four open PRs implement the jax-js-bayes library. All target the same DESIGN.md specification but differ significantly in completeness and validation coverage. **PR #5 (washington)** is recommended for merge due to complete posteriordb coverage, but has **blocking type safety issues** that must be fixed first. **PR #3 (codex)** has a critical gap: no posteriordb tests.
 
 ---
 
@@ -20,6 +21,54 @@ Four open PRs implement the jax-js-bayes library. All target the same DESIGN.md 
 | #4 | dakar | 2,833 | 4 | 68 | Good |
 | #2 | melbourne | 3,275 | 3 | 81 | Good |
 | #3 | codex | 2,710 | 0 | ~35 | **Blocking defect** |
+
+---
+
+## Critical Findings (by severity)
+
+### Critical
+
+| Issue | PR | Location | Description |
+|-------|-----|----------|-------------|
+| No posteriordb tests | #3 codex | `package.json:13-17` | Zero inference validation against Stan references |
+| Type safety not enforced | #5 washington | `src/model.ts:40-46` | `BoundModel` always exposes `logProb` regardless of `kind` - should use conditional type |
+| Partial observed accepted | #5 washington | `src/model.ts:213-238` | `bind()` silently accepts partial observed data, producing predictive model with callable `logProb` |
+| Hardcoded references | #2 melbourne | `tests/posteriordb/eight-schools.test.ts:34-38` | Uses approximate hardcoded values instead of posteriordb reference data |
+
+### High
+
+| Issue | PR | Location | Description |
+|-------|-----|----------|-------------|
+| Named dimensions unsupported | #4 dakar | `src/compile.ts:136-163` | String shapes treated as data field names, only uses first dimension |
+| Context-dependent priors blocked | #3 codex | `src/model.ts:34-40` | Cannot define priors that depend on other parameters (blocks centered parameterization) |
+| Type-level enforcement missing | #2 melbourne | `src/model.ts:113-133` | Returns union type, no compile-time prevention of `logProb` on predictive |
+
+### Medium
+
+| Issue | PR | Location | Description |
+|-------|-----|----------|-------------|
+| samplePrior/simulate mismatch | #4 dakar | `src/compile.ts:150-179` | `samplePrior` returns unconstrained, design intent was constrained draws |
+| Missing bernoulli | #4 dakar | `src/distributions/index.ts:1-7` | Required by DESIGN.md but not implemented |
+| Gather gradient limitation | #4 dakar | `src/utils.ts:3-7` | `np.take` for hierarchical indexing breaks HMC gradients |
+
+### Low
+
+| Issue | PR | Location | Description |
+|-------|-----|----------|-------------|
+| Local file dependencies | #2, #4 | `package.json` | Uses `file:../` for jax-js-mcmc - not publishable |
+| Missing viz module | #2, #4 | - | No `src/viz/` directory per DESIGN.md |
+
+---
+
+## Blocking Issues for Merge
+
+**PR #5 (washington)** - recommended but requires fixes:
+1. Enforce Complete/Predictive at type level: change `logProb` to `S extends "complete" ? ... : never` (`src/model.ts:40-46`)
+2. Reject partial observed data in `bind()` or make `logProb` inaccessible (`src/model.ts:213-238`)
+3. Ensure posteriordb tests are mandatory in CI (currently skip when data missing)
+
+**PR #3 (codex)** - not mergeable:
+1. Add posteriordb integration tests (critical requirement per CLAUDE.md)
 
 ---
 
@@ -70,28 +119,30 @@ const logP = bound.logProb({ mu, tau });
 
 | PR | Score | Notes |
 |----|-------|-------|
-| #4 dakar | 10 | `HasAllObserved<Spec, D>` conditional type |
-| #5 washington | 9 | `BoundKind` + runtime discrimination |
-| #2 melbourne | 9 | `BoundModel<S>` with conditional `logProb` |
-| #3 codex | 8 | Discriminated unions, less sophisticated |
+| #4 dakar | 6 | Has conditional types but samplePrior/simulate workflow mismatch |
+| #5 washington | 4 | `logProb` always exposed regardless of `kind` - **critical gap** |
+| #2 melbourne | 4 | Returns union type, no compile-time `logProb` prevention |
+| #3 codex | 4 | Discriminated unions but no workflow enforcement |
 
-**Winner: #4 (dakar)** - Most advanced compile-time workflow enforcement prevents calling `logProb` on predictive models at the TypeScript level.
+**Note:** All PRs fail to fully enforce Complete/Predictive at the type level. #4 (dakar) is closest with `HasAllObserved<Spec, D>` conditional type, but has other issues.
 
 ---
 
 ### 4. posteriordb Validation (Critical)
 
-| PR | Score | Models Tested |
-|----|-------|---------------|
-| #5 washington | 10 | Eight Schools (C/NC), Kidscore, Kidscore Interaction, Radon (pooled/hierarchical), Wells, BLR, Log-Earn, Earn-Height, Mesquite |
-| #4 dakar | 8 | Eight Schools, Kidscore, Radon (2), Wells |
-| #2 melbourne | 8 | Eight Schools, Kidscore, Wells |
-| #3 codex | 0 | **None** |
+| PR | Score | Models Tested | Notes |
+|----|-------|---------------|-------|
+| #5 washington | 10 | 11 models (complete matrix) | Uses posteriordb reference data |
+| #4 dakar | 6 | 5 models | Reduced datasets, subset coverage |
+| #2 melbourne | 4 | 3 models | **Uses hardcoded approximate values, not posteriordb data** |
+| #3 codex | 0 | **None** | No inference validation |
 
 **Critical Note from CLAUDE.md:**
 > "posteriordb tests validate inference correctness against Stan reference posteriors. These are the gold standard - if posteriordb tests fail, the library is producing wrong results."
 
-**PR #3 fails this requirement entirely.**
+**Issues:**
+- PR #3 fails this requirement entirely
+- PR #2 uses hardcoded reference values (`const reference = { mu: { mean: 4.3, sd: 3.3 } }`) instead of loading from posteriordb
 
 ---
 
@@ -155,14 +206,16 @@ All PRs correctly handle jax-js move semantics to prevent memory leaks in WebGPU
 
 ---
 
-## Overall Scores
+## Overall Scores (Revised)
 
-| PR | Average | Recommendation |
-|----|---------|----------------|
-| **#5 washington** | **8.7** | **Merge** |
-| #4 dakar | 7.8 | Good alternative |
-| #2 melbourne | 8.1 | Good, needs posteriordb expansion |
-| #3 codex | 6.3 | **Do not merge** (missing posteriordb) |
+| PR | Architecture | API | Types | posteriordb | Quality | Memory | Viz | **Average** | Recommendation |
+|----|--------------|-----|-------|-------------|---------|--------|-----|-------------|----------------|
+| #5 washington | 8 | 8 | 4 | 10 | 9 | 10 | 8 | **8.1** | **Merge after fixes** |
+| #4 dakar | 6 | 6 | 6 | 6 | 9 | 9 | 0 | **6.0** | Needs work |
+| #2 melbourne | 6 | 6 | 4 | 4 | 9 | 9 | 0 | **5.4** | Needs work |
+| #3 codex | 7 | 7 | 4 | 0 | 8 | 9 | 8 | **6.1** | **Do not merge** |
+
+**Note:** Scores revised after cross-referencing with yokohama-v1 review which identified critical type safety gaps.
 
 ---
 
@@ -181,8 +234,8 @@ All PRs correctly handle jax-js move semantics to prevent memory leaks in WebGPU
 
 ### PR #2 (melbourne)
 - Most tests (81 total)
-- Rigorous analytical validation
 - Clean runtime composition
+- **Weakness:** Uses hardcoded posteriordb values, not actual reference data
 
 ### PR #3 (codex)
 - Visualization support
@@ -195,10 +248,10 @@ All PRs correctly handle jax-js move semantics to prevent memory leaks in WebGPU
 
 | PR | Required Before Merge |
 |----|----------------------|
-| #5 washington | Add JSDoc documentation to public functions |
-| #4 dakar | Add viz module, add `bernoulli` distribution |
-| #2 melbourne | Expand posteriordb to 11 models, add viz module |
-| #3 codex | **Add posteriordb tests** (blocking) |
+| #5 washington | **Fix type safety** (`src/model.ts:40-46`), reject partial observed, add JSDoc |
+| #4 dakar | Fix named dimensions, add viz module, add `bernoulli`, fix samplePrior |
+| #2 melbourne | Replace hardcoded refs with posteriordb data, fix type safety, add viz |
+| #3 codex | **Add posteriordb tests** (blocking), add context-dependent priors |
 
 ---
 
@@ -216,8 +269,23 @@ All PRs correctly handle jax-js move semantics to prevent memory leaks in WebGPU
 
 ## Conclusion
 
-**PR #5 (washington)** should be merged. It is the only implementation with complete posteriordb coverage as specified in DESIGN.md, has solid architecture, proper memory safety, and includes visualization support.
+**PR #5 (washington)** is recommended for merge after addressing blocking issues:
+1. Fix type safety: `logProb` must be conditional on `kind === "complete"` (`src/model.ts:40-46`)
+2. Reject partial observed data or hide `logProb` on predictive models (`src/model.ts:213-238`)
+3. Make posteriordb tests mandatory in CI
 
-**PR #3 (codex)** should not be merged in its current state due to missing posteriordb integration tests, which are explicitly required per project guidelines.
+It is the only implementation with complete posteriordb coverage as specified in DESIGN.md, has solid architecture, proper memory safety, and includes visualization support.
 
-PRs #2 and #4 are viable alternatives but require additional work to match #5's posteriordb coverage.
+**PR #3 (codex)** should not be merged due to missing posteriordb integration tests.
+
+**PRs #2 and #4** require significant work: melbourne uses hardcoded reference values, dakar has workflow mismatches and missing features.
+
+---
+
+## Appendix: Cross-Reference with yokohama-v1 Review
+
+This review was updated after comparing with the yokohama-v1 workspace review, which identified several critical issues missed in the initial assessment:
+- Washington type safety gap (originally rated 9/10, revised to 4/10)
+- Melbourne hardcoded posteriordb references (originally rated 8/10, revised to 4/10)
+- Dakar samplePrior/simulate workflow mismatch
+- Codex context-dependent prior limitation
