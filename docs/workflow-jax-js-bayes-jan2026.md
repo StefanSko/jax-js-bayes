@@ -11,15 +11,16 @@ The library was developed through:
   - **Melbourne** (Claude Code) → PR #2
   - **Edinburgh** (Codex) → PR #3
   - **Dakar** (Claude Code) → PR #4
-  - **Washington** (Codex) → PR #5 ✅ **MERGED**
-- **Additional coordination worktrees** for review and merge:
-  - Abu Dhabi (documentation)
+  - **Washington** (Codex) → PR #5 (base implementation)
+- **Coordination and merge strategy**:
+  - Abu Dhabi (documentation) → PR #1 ✅ MERGED
   - Columbia (PR comparison)
-  - Yokohama (merge plan)
-  - Hong Kong (final deployment)
+  - Yokohama (created MERGE_PLAN.md - "best-of" strategy)
+  - Washington/tmp (implemented merge plan) → PR #6 ✅ **MERGED**
+  - Hong Kong (fixed memory, merged PR #6)
 - **17 total sessions** (9 Claude Code + 8 Codex)
 
-From concept to validated library with 11 posteriordb reference tests passing in ~48 hours of wall-clock time.
+From concept to validated library in ~48 hours. Final implementation: PR #5 (Washington base) + PR #6 (merge plan with best features from all PRs).
 
 ---
 
@@ -76,12 +77,12 @@ Four independent worktrees implementing the library in parallel:
 - 7 prompts, 2 pages, 900 KB session
 - Testing and refinements
 
-#### Washington Worktree (Codex) → PR #5 ✅ **MERGED to main**
+#### Washington Worktree (Codex) → PR #5 (Base Implementation)
 
 **[Codex: Jan 17 #4](https://gistpreview.github.io/?b84f6e9521b09b4f8fadc24d9847dfbc/index.html)** *(17:35-17:55 UTC, parallel with Dakar)*
-- 1 prompt, 1 page, 2.0 MB session (likely initial)
-- **Core library implementation**
-- Merged Jan 18 at 16:24 UTC
+- 1 prompt, 1 page, 2.0 MB session
+- **Core library implementation (base)**
+- Merged to main Jan 18 at 01:26 UTC as foundation
 
 ---
 
@@ -114,21 +115,28 @@ After 4 competing implementations, consolidation and review:
 - Extended review and testing
 - Likely supporting Washington merge decision
 
-#### Yokohama Worktree (Strategic Planning)
+#### Yokohama Worktree (Merge Plan Strategy)
 
 **[Codex: Jan 18 #2](https://gistpreview.github.io/?9c45453f499fc095a55137a85c1fc4e6/index.html)** *(10:01-10:10 UTC)*
-- 4 prompts, 1 page, 676 KB session
-- Initial PR analysis
+- Working in yokohama-v1 worktree
+- **Created MERGE_PLAN.md** - "best-of" strategy
+- Plan: Use Washington (PR #5) as base, cherry-pick best features from other PRs
 
 **[Codex: Jan 18 #3](https://gistpreview.github.io/?96ad577fee5fc04bf945c9fd3307bac6/index.html)** *(10:02-10:03 UTC)*
-- 1 prompt, 1 page, 394 KB session
-- Continued analysis
+- Continued merge plan refinement
 
 **[Claude Code: Yokohama-v1](https://gisthost.github.io/?aa1ca2b6775e41ccd1dbb3526bfe2987/index.html)** *(13:51-13:55 UTC)*
-- 12 prompts, 3 pages, 12 KB session
-- **Created merge plan for main branch**
-- Analyzed all open PRs (2-5)
-- Strategic decision: merge Washington (PR #5)
+- Investigated PR #6 memory issues
+- Root cause analysis attempt
+
+#### Washington/Merge Plan Implementation → PR #6 ✅ **MERGED to main**
+
+**[Codex: Jan 18](https://gistpreview.github.io/?95d937f5b48a9244dc407b9809917df4/index.html)** *(10:22-13:47 UTC)*
+- Working in /tmp/washington worktree
+- **Implemented MERGE_PLAN.md on codex/merge-plan branch**
+- Type-level complete/predictive enforcement
+- Reference draw fallback system
+- Created PR #6 at 13:47 UTC
 
 ---
 
@@ -137,12 +145,12 @@ After 4 competing implementations, consolidation and review:
 #### Hong Kong Worktree (Memory Fixes & Deployment)
 
 **[Claude Code: Hong Kong](https://gisthost.github.io/?4e88e559793c66b019f3da53e86e6bab/index.html)** *(15:44-16:32 UTC)*
-- 7 prompts, 2 pages, 1.3 MB session
-- Investigated jax-js-mcmc memory leak fixes (PR #10)
+- Investigated PR #6 (codex/merge-plan) memory issues
+- Found jax-js-mcmc memory leak fixes in PR #10
 - Refactored posteriordb.test.ts for lazy loading
-- Fixed ERR_WORKER_OUT_OF_MEMORY issues
-- **Executed merge of PR #5 (Washington) to main**
-- Final validation and deployment
+- Fixed ERR_WORKER_OUT_OF_MEMORY with process isolation
+- **Merged PR #6 (merge plan implementation) to main at 16:24 UTC**
+- Final implementation combines Washington base + best features from all PRs
 
 ---
 
@@ -227,15 +235,19 @@ gantt
 ## Development Metrics
 
 - **Wall-clock time:** ~48 hours (Jan 16 3PM - Jan 18 4:30PM UTC)
-- **Active development:** ~20 hours across 15 sessions
+- **Active development:** ~20 hours across 17 sessions
 - **Parallel worktrees:** 8 (4 implementing, 4 coordinating)
-- **Pull requests created:** 5 (PRs #1-5)
-- **Pull request merged:** PR #5 (Washington - Codex implementation)
+- **Pull requests created:** 6 (PRs #1-6)
+- **Pull requests merged:**
+  - PR #1 (Abu Dhabi - documentation)
+  - PR #5 (Washington - base implementation)
+  - PR #6 (codex/merge-plan - best-of merge strategy) ✅ **FINAL**
 - **Lines of code:**
   - PR #2 (Melbourne): 3,275 additions
   - PR #3 (Edinburgh): 2,710 additions
   - PR #4 (Dakar): 2,833 additions
-  - PR #5 (Washington): 1,843 additions ✅ **MERGED**
+  - PR #5 (Washington): 1,843 additions ✅ merged as base
+  - PR #6 (codex/merge-plan): 4,962 additions ✅ **FINAL MERGE**
 - **Total sessions:** 17 (9 Claude Code + 8 Codex)
 - **Total events:** 14,664 tool calls and interactions
 
@@ -258,12 +270,13 @@ gantt
 - PR-based comparison at integration time
 
 ### Strategic Merge Selection
-Rather than trying to merge all PRs:
+Rather than merging all PRs or picking just one:
 - Columbia session compared all 4 implementations
-- Yokohama session created strategic merge plan
-- Washington (PR #5) selected as best implementation
-- Clean single merge to main
-- Other PRs remain as alternative implementations
+- Yokohama Codex sessions created MERGE_PLAN.md - "best-of" strategy
+- Plan: Use Washington (PR #5) as base, cherry-pick best features from others
+- Codex implemented merge plan on codex/merge-plan branch (PR #6)
+- Hong Kong fixed memory issues and merged PR #6 to main
+- Final code = Washington base + selected features from Melbourne/Dakar/Edinburgh
 
 ### Last-Mile Problem Solving
 Hong Kong session caught critical deployment issues:
@@ -289,7 +302,8 @@ Parallel use of both agents:
 | #2 | Melbourne | Claude Code + Codex | 3,275 | Open |
 | #3 | Edinburgh | Codex | 2,710 | Open |
 | #4 | Dakar | Claude Code + Codex | 2,833 | Open |
-| #5 | **Washington** | **Codex** | **1,843** | **✅ Merged to main** |
+| #5 | Washington | Codex | 1,843 | ✅ Merged (base) |
+| #6 | **codex/merge-plan** | **Codex** | **4,962** | **✅ Merged to main** |
 
 ---
 
@@ -316,10 +330,10 @@ Parallel use of both agents:
 | Session | Worktree | Duration | Transcript |
 |---------|----------|----------|------------|
 | Columbia | PR Comparison | 7h 4min | [gist](https://gisthost.github.io/?2e2ccfac8aaded0b281e5f07848f6197/index.html) |
-| Codex Jan 18 #1 | Review | 3h 37min | [gist](https://gistpreview.github.io/?95d937f5b48a9244dc407b9809917df4/index.html) |
-| Yokohama Codex #1 | PR Analysis | 9min | [gist](https://gistpreview.github.io/?9c45453f499fc095a55137a85c1fc4e6/index.html) |
-| Yokohama Codex #2 | Continued Analysis | 1min | [gist](https://gistpreview.github.io/?96ad577fee5fc04bf945c9fd3307bac6/index.html) |
-| Yokohama-v1 | **Merge Plan** | 5min | [gist](https://gisthost.github.io/?aa1ca2b6775e41ccd1dbb3526bfe2987/index.html) |
+| Yokohama Codex #1 | Created MERGE_PLAN.md | 9min | [gist](https://gistpreview.github.io/?9c45453f499fc095a55137a85c1fc4e6/index.html) |
+| Yokohama Codex #2 | Plan Refinement | 1min | [gist](https://gistpreview.github.io/?96ad577fee5fc04bf945c9fd3307bac6/index.html) |
+| Codex Jan 18 | **Implemented Merge Plan (PR #6)** | 3h 37min | [gist](https://gistpreview.github.io/?95d937f5b48a9244dc407b9809917df4/index.html) |
+| Yokohama CC | Memory Investigation | 5min | [gist](https://gisthost.github.io/?aa1ca2b6775e41ccd1dbb3526bfe2987/index.html) |
 
 ### Phase 3: Deployment
 
@@ -329,8 +343,10 @@ Parallel use of both agents:
 
 ---
 
-## Final Commit
+## Final Commits
 
-**Merged to main:** [563fd19](https://github.com/StefanSko/jax-js-bayes/commit/563fd19) via PR #5 (Washington)
+**PR #5 (Washington base):** [d8b9243](https://github.com/StefanSko/jax-js-bayes/commit/d8b9243) merged Jan 18 at 01:26 UTC
 
-Full library implementation with posteriordb validation, reference draws, and memory-optimized test execution.
+**PR #6 (Merge plan):** [563fd19](https://github.com/StefanSko/jax-js-bayes/commit/563fd19) merged Jan 18 at 16:24 UTC
+
+Final implementation combines Washington's base with best features from all PRs, posteriordb validation, reference draws, and memory-optimized test execution.
