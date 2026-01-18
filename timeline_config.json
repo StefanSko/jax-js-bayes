@@ -55,7 +55,15 @@
             "path": "/Users/stefansko/.codex/sessions/2026/01/18/rollout-2026-01-18T11-10-15-019bd095-7a8e-7002-b5ef-6cfed7454da5.jsonl",
             "type": "codex"
         },
-        "Yokohama-v1": {
+        "Yokohama (Codex #2)": {
+            "path": "/Users/stefansko/.codex/sessions/2026/01/18/rollout-2026-01-18T11-01-52-019bd08d-cb38-7612-add3-1362f621a69b.jsonl",
+            "type": "codex"
+        },
+        "Yokohama (Codex #3)": {
+            "path": "/Users/stefansko/.codex/sessions/2026/01/18/rollout-2026-01-18T11-02-01-019bd08d-edfb-7ae1-8824-6a02162c753a.jsonl",
+            "type": "codex"
+        },
+        "Yokohama CC": {
             "path": "/Users/stefansko/.claude/projects/-Users-stefansko-conductor-workspaces-jax-js-bayes-yokohama-v1/c4d87f09-2312-4ddc-853d-1f92faa21ddc.jsonl",
             "type": "claude"
         },
