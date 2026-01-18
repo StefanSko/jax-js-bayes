@@ -24,8 +24,8 @@ const HMC_CONFIG = {
 };
 
 describe("posteriordb", () => {
-  const eightStats = loadMeanStats("eight_schools-eight_schools_noncentered");
   test("eight schools noncentered", async () => {
+    const eightStats = loadMeanStats("eight_schools-eight_schools_noncentered");
     const data = loadData("eight_schools");
     const bound = eightSchoolsNoncentered.bind({
       y: np.array(data.y as number[]),
@@ -54,6 +54,7 @@ describe("posteriordb", () => {
   });
 
   test("eight schools centered", async () => {
+    const eightStats = loadMeanStats("eight_schools-eight_schools_noncentered");
     const data = loadData("eight_schools");
     const bound = eightSchoolsCentered.bind({
       y: np.array(data.y as number[]),
@@ -81,8 +82,8 @@ describe("posteriordb", () => {
     expectMeanClose("tau", tauMean, tauRef);
   });
 
-  const kidiqStats = loadMeanStats("kidiq-kidscore_momiq");
   test("kidscore momiq", async () => {
+    const kidiqStats = loadMeanStats("kidiq-kidscore_momiq");
     const data = loadData("kidiq");
     const bound = kidscoreMomiq.bind({
       mom_iq: np.array(data.mom_iq as number[]),
@@ -113,8 +114,8 @@ describe("posteriordb", () => {
     expectMeanClose("sigma", sigmaMean, sigmaRef);
   });
 
-  const kidiqInteractionStats = loadMeanStats("kidiq-kidscore_interaction");
   test("kidscore interaction", async () => {
+    const kidiqInteractionStats = loadMeanStats("kidiq-kidscore_interaction");
     const data = loadData("kidiq");
     const bound = kidscoreInteraction.bind({
       mom_hs: np.array(data.mom_hs as number[]),
@@ -159,8 +160,8 @@ describe("posteriordb", () => {
     expectMeanClose("sigma", sigmaMean, sigmaRef);
   });
 
-  const blrStats = loadMeanStats("sblrc-blr");
   test("blr", async () => {
+    const blrStats = loadMeanStats("sblrc-blr");
     const data = loadData("sblrc");
     const bound = blr.bind({
       X: np.array(data.X as number[][]),
@@ -187,8 +188,8 @@ describe("posteriordb", () => {
     expectMeanClose("sigma", sigmaMean, sigmaRef);
   });
 
-  const logearnStats = loadMeanStats("earnings-logearn_height");
   test("logearn height", async () => {
+    const logearnStats = loadMeanStats("earnings-logearn_height");
     const data = loadData("earnings");
     const bound = logearnHeight.bind({
       height: np.array(data.height as number[]),
@@ -219,8 +220,8 @@ describe("posteriordb", () => {
     expectMeanClose("sigma", sigmaMean, sigmaRef);
   });
 
-  const earnStats = loadMeanStats("earnings-earn_height");
   test("earn height", async () => {
+    const earnStats = loadMeanStats("earnings-earn_height");
     const data = loadData("earnings");
     const bound = earnHeight.bind({
       height: np.array(data.height as number[]),
@@ -251,8 +252,8 @@ describe("posteriordb", () => {
     expectMeanClose("sigma", sigmaMean, sigmaRef);
   });
 
-  const mesquiteStats = loadMeanStats("mesquite-logmesquite_logvolume");
   test("mesquite logvolume", async () => {
+    const mesquiteStats = loadMeanStats("mesquite-logmesquite_logvolume");
     const data = loadData("mesquite");
     const bound = mesquiteLogVolume.bind({
       K: 2,
@@ -285,8 +286,8 @@ describe("posteriordb", () => {
     expectMeanClose("sigma", sigmaMean, sigmaRef);
   });
 
-  const radonStats = loadMeanStats("radon_all-radon_pooled");
   test("radon pooled", async () => {
+    const radonStats = loadMeanStats("radon_all-radon_pooled");
     const data = loadData("radon_all");
     const bound = radonPooled.bind({
       floor_measure: np.array(data.floor_measure as number[]),
@@ -317,8 +318,8 @@ describe("posteriordb", () => {
     expectMeanClose("sigma", sigmaMean, sigmaRef);
   });
 
-  const radonHierStats = loadMeanStats("radon_mn-radon_hierarchical_intercept_noncentered");
   test("radon hierarchical", async () => {
+    const radonHierStats = loadMeanStats("radon_mn-radon_hierarchical_intercept_noncentered");
     const data = loadData("radon_mn");
     const countyIdx = (data.county_idx as number[]).map((value) => value - 1);
     const bound = radonHierarchical.bind({
@@ -356,8 +357,8 @@ describe("posteriordb", () => {
     expectMeanClose("sigma_y", sigmaYMean, sigmaYRef);
   });
 
-  const wellsStats = loadMeanStats("wells_data-wells_dist");
   test("wells distance", async () => {
+    const wellsStats = loadMeanStats("wells_data-wells_dist");
     const data = loadData("wells_data");
     const bound = wellsDist.bind({
       dist: np.array(data.dist as number[]),

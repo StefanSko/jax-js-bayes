@@ -10,4 +10,12 @@ export default defineConfig({
       "jax-js-mcmc": path.join(rootDir, "node_modules/jax-js-mcmc/src/index.ts"),
     },
   },
+  test: {
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
+  },
 });
