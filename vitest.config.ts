@@ -7,7 +7,8 @@ const rootDir = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   resolve: {
     alias: {
-      "jax-js-mcmc": path.join(rootDir, "node_modules/jax-js-mcmc/src/index.ts"),
+      "jax-js-mcmc": path.join(rootDir, "src/mcmc/index.ts"),
+      "jax-js-mcmc-2": path.join(rootDir, "node_modules/jax-js-mcmc-2/src/index.ts"),
     },
   },
   test: {

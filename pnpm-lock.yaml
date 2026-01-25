@@ -4,7 +4,7 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-packageExtensionsChecksum: 8890a3b444671c8a620bab9ad38acc29
+packageExtensionsChecksum: sha256-AUh7tKmJGPilM7Nzj1Z6X8s0St/0fEBkstkVbBcjoQ0=
 
 importers:
 
@@ -16,9 +16,9 @@ importers:
       '@observablehq/plot':
         specifier: '>=0.6'
         version: 0.6.17
-      jax-js-mcmc:
-        specifier: github:StefanSko/jax-js-mcmc
-        version: https://codeload.github.com/StefanSko/jax-js-mcmc/tar.gz/33b9516bd449f676aca0a8bfa1e54a2cd76c40f4(@jax-js/jax@0.1.6)
+      jax-js-mcmc-2:
+        specifier: github:StefanSko/jax-js-mcmc-2
+        version: jax-js-mcmc@https://codeload.github.com/StefanSko/jax-js-mcmc-2/tar.gz/8dfa1435f219a24026578be9d97de33bf5ed9993
     devDependencies:
       '@types/node':
         specifier: ^20.12.7
@@ -578,11 +578,9 @@ packages:
   isoformat@0.2.1:
     resolution: {integrity: sha512-tFLRAygk9NqrRPhJSnNGh7g7oaVWDwR0wKh/GM2LgmPa50Eg4UfyaCO4I8k6EqJHl1/uh2RAD6g06n5ygEnrjQ==}
 
-  jax-js-mcmc@https://codeload.github.com/StefanSko/jax-js-mcmc/tar.gz/33b9516bd449f676aca0a8bfa1e54a2cd76c40f4:
-    resolution: {tarball: https://codeload.github.com/StefanSko/jax-js-mcmc/tar.gz/33b9516bd449f676aca0a8bfa1e54a2cd76c40f4}
+  jax-js-mcmc@https://codeload.github.com/StefanSko/jax-js-mcmc-2/tar.gz/8dfa1435f219a24026578be9d97de33bf5ed9993:
+    resolution: {tarball: https://codeload.github.com/StefanSko/jax-js-mcmc-2/tar.gz/8dfa1435f219a24026578be9d97de33bf5ed9993}
     version: 0.1.0
-    peerDependencies:
-      '@jax-js/jax': '>=0.1.0'
 
   js-tokens@9.0.1:
     resolution: {integrity: sha512-mxa9E9ITFOt0ban3j6L5MpjwegGz6lBQmM1IJkWeBZGcMxto50+eWdjC/52xDbS2vy0k7vIMK0Fe2wfL9OQSpQ==}
@@ -1278,7 +1276,7 @@ snapshots:
 
   isoformat@0.2.1: {}
 
-  jax-js-mcmc@https://codeload.github.com/StefanSko/jax-js-mcmc/tar.gz/33b9516bd449f676aca0a8bfa1e54a2cd76c40f4(@jax-js/jax@0.1.6):
+  jax-js-mcmc@https://codeload.github.com/StefanSko/jax-js-mcmc-2/tar.gz/8dfa1435f219a24026578be9d97de33bf5ed9993:
     dependencies:
       '@jax-js/jax': 0.1.6
 
