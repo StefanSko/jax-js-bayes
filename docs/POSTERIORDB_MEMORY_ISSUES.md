@@ -75,10 +75,15 @@ processes with an 8GB heap. `posteriordb.test.ts` still OOMs (~7.2GB heap).
 
 ## Next steps (planned)
 
-1) **Stream reference draw parsing** to avoid loading full JSON arrays.
-   - Compute means incrementally (single pass) instead of materializing all draws.
-2) **Reduce reference draw size/usage**:
+1) **Reduce reference draw size/usage**:
    - Only compute means for parameters needed by the current test.
 3) **Keep process isolation** as a fallback for CI.
 4) **Upstream `jax-js-mcmc-2` patch** (dynamic step size + JIT warmup)
    and remove the local tsconfig override once released.
+
+## Implemented since initial report
+
+- `loadLocalMeanStats` now parses the JSON array incrementally (object-by-object)
+  instead of `JSON.parse` on the full array, reducing peak memory.  
+- Posteriordb still OOMs after this change (isolated run, 8GB heap), so the
+  remaining issue is likely HMC draws + dataset size rather than zip parsing.
