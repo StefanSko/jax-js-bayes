@@ -81,9 +81,8 @@ processes with an 8GB heap. `posteriordb.test.ts` still OOMs (~7.2GB heap).
 4) **Upstream `jax-js-mcmc-2` patch** (dynamic step size + JIT warmup)
    and remove the local tsconfig override once released.
 
-## Implemented since initial report
+## Attempted (not retained)
 
-- `loadLocalMeanStats` now parses the JSON array incrementally (object-by-object)
-  instead of `JSON.parse` on the full array, reducing peak memory.  
-- Posteriordb still OOMs after this change (isolated run, 8GB heap), so the
-  remaining issue is likely HMC draws + dataset size rather than zip parsing.
+- Tried incremental parsing of local reference draws to reduce peak memory.
+  This did not prevent the OOM in `posteriordb.test.ts`, so the change was not
+  kept. We still need deeper profiling of HMC draws + dataset size.
