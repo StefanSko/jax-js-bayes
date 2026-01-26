@@ -3,6 +3,7 @@ import { numpy as np, random } from "@jax-js/jax";
 import { hmc } from "jax-js-mcmc";
 import { loadData, loadMeanStats } from "./pdb";
 import { drawMean, expectMeanClose } from "./helpers";
+import { disposeHmcResult, logMemory, maybeDisposeTree } from "./memory";
 import {
   eightSchoolsNoncentered,
   eightSchoolsCentered,
@@ -25,6 +26,7 @@ const HMC_CONFIG = {
 
 describe("posteriordb", () => {
   test("eight schools noncentered", async () => {
+    logMemory("test start: eight schools noncentered");
     const eightStats = loadMeanStats("eight_schools-eight_schools_noncentered");
     const data = loadData("eight_schools");
     const bound = eightSchoolsNoncentered.bind({
@@ -51,9 +53,13 @@ describe("posteriordb", () => {
 
     expectMeanClose("mu", muMean, muRef);
     expectMeanClose("tau", tauMean, tauRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: eight schools noncentered");
   });
 
   test("eight schools centered", async () => {
+    logMemory("test start: eight schools centered");
     const eightStats = loadMeanStats("eight_schools-eight_schools_noncentered");
     const data = loadData("eight_schools");
     const bound = eightSchoolsCentered.bind({
@@ -80,9 +86,13 @@ describe("posteriordb", () => {
 
     expectMeanClose("mu", muMean, muRef);
     expectMeanClose("tau", tauMean, tauRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: eight schools centered");
   });
 
   test("kidscore momiq", async () => {
+    logMemory("test start: kidscore momiq");
     const kidiqStats = loadMeanStats("kidiq-kidscore_momiq");
     const data = loadData("kidiq");
     const bound = kidscoreMomiq.bind({
@@ -112,9 +122,13 @@ describe("posteriordb", () => {
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
     expectMeanClose("sigma", sigmaMean, sigmaRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: kidscore momiq");
   });
 
   test("kidscore interaction", async () => {
+    logMemory("test start: kidscore interaction");
     const kidiqInteractionStats = loadMeanStats("kidiq-kidscore_interaction");
     const data = loadData("kidiq");
     const bound = kidscoreInteraction.bind({
@@ -158,9 +172,13 @@ describe("posteriordb", () => {
     expectMeanClose("beta2", beta2Mean, beta2Ref);
     expectMeanClose("beta3", beta3Mean, beta3Ref);
     expectMeanClose("sigma", sigmaMean, sigmaRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: kidscore interaction");
   });
 
   test("blr", async () => {
+    logMemory("test start: blr");
     const blrStats = loadMeanStats("sblrc-blr");
     const data = loadData("sblrc");
     const bound = blr.bind({
@@ -178,7 +196,7 @@ describe("posteriordb", () => {
       initialParams,
     });
 
-    const beta1Mean = drawMean(np.take(result.draws.beta, 0, -1));
+    const beta1Mean = drawMean(np.take(result.draws.beta.ref, 0, -1));
     const sigmaMean = drawMean(result.draws.sigma);
 
     const beta1Ref = blrStats.mean_value[blrStats.names.indexOf("beta[1]")];
@@ -186,9 +204,13 @@ describe("posteriordb", () => {
 
     expectMeanClose("beta[1]", beta1Mean, beta1Ref);
     expectMeanClose("sigma", sigmaMean, sigmaRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: blr");
   });
 
   test("logearn height", async () => {
+    logMemory("test start: logearn height");
     const logearnStats = loadMeanStats("earnings-logearn_height");
     const data = loadData("earnings");
     const bound = logearnHeight.bind({
@@ -218,9 +240,13 @@ describe("posteriordb", () => {
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
     expectMeanClose("sigma", sigmaMean, sigmaRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: logearn height");
   });
 
   test("earn height", async () => {
+    logMemory("test start: earn height");
     const earnStats = loadMeanStats("earnings-earn_height");
     const data = loadData("earnings");
     const bound = earnHeight.bind({
@@ -250,9 +276,13 @@ describe("posteriordb", () => {
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
     expectMeanClose("sigma", sigmaMean, sigmaRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: earn height");
   });
 
   test("mesquite logvolume", async () => {
+    logMemory("test start: mesquite logvolume");
     const mesquiteStats = loadMeanStats("mesquite-logmesquite_logvolume");
     const data = loadData("mesquite");
     const bound = mesquiteLogVolume.bind({
@@ -273,8 +303,8 @@ describe("posteriordb", () => {
       initialParams,
     });
 
-    const beta0Mean = drawMean(np.take(result.draws.beta, 0, -1));
-    const beta1Mean = drawMean(np.take(result.draws.beta, 1, -1));
+    const beta0Mean = drawMean(np.take(result.draws.beta.ref, 0, -1));
+    const beta1Mean = drawMean(np.take(result.draws.beta.ref, 1, -1));
     const sigmaMean = drawMean(result.draws.sigma);
 
     const beta0Ref = mesquiteStats.mean_value[mesquiteStats.names.indexOf("beta[1]")];
@@ -284,9 +314,13 @@ describe("posteriordb", () => {
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
     expectMeanClose("sigma", sigmaMean, sigmaRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: mesquite logvolume");
   });
 
   test("radon pooled", async () => {
+    logMemory("test start: radon pooled");
     const radonStats = loadMeanStats("radon_all-radon_pooled");
     const data = loadData("radon_all");
     const bound = radonPooled.bind({
@@ -316,9 +350,13 @@ describe("posteriordb", () => {
     expectMeanClose("alpha", alphaMean, alphaRef);
     expectMeanClose("beta", betaMean, betaRef);
     expectMeanClose("sigma", sigmaMean, sigmaRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: radon pooled");
   });
 
   test("radon hierarchical", async () => {
+    logMemory("test start: radon hierarchical");
     const radonHierStats = loadMeanStats("radon_mn-radon_hierarchical_intercept_noncentered");
     const data = loadData("radon_mn");
     const countyIdx = (data.county_idx as number[]).map((value) => value - 1);
@@ -355,9 +393,13 @@ describe("posteriordb", () => {
     expectMeanClose("mu_alpha", muAlphaMean, muAlphaRef);
     expectMeanClose("sigma_alpha", sigmaAlphaMean, sigmaAlphaRef);
     expectMeanClose("sigma_y", sigmaYMean, sigmaYRef);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: radon hierarchical");
   });
 
   test("wells distance", async () => {
+    logMemory("test start: wells distance");
     const wellsStats = loadMeanStats("wells_data-wells_dist");
     const data = loadData("wells_data");
     const bound = wellsDist.bind({
@@ -383,5 +425,8 @@ describe("posteriordb", () => {
 
     expectMeanClose("beta0", beta0Mean, beta0Ref);
     expectMeanClose("beta1", beta1Mean, beta1Ref);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    logMemory("test end: wells distance");
   });
 });

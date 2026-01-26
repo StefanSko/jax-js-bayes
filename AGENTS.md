@@ -1,5 +1,8 @@
 # Agent Instructions for jax-js-bayes
 
+This repo uses AI coding assistants. See `CLAUDE.md` for full workflow and
+memory model details. This file is a concise entry point.
+
 ## Project Overview
 
 jax-js-bayes is a declarative Bayesian modeling library for jax-js.
@@ -9,16 +12,16 @@ It provides a TypeScript DSL for defining probabilistic models.
 
 This library depends on:
 - **@jax-js/jax** - Array operations, autodiff
-- **jax-js-mcmc** - HMC sampling (see companion repo)
+- **jax-js-mcmc-2** - HMC sampling (companion repo)
 
 Clone references:
 
 ```bash
 git clone https://github.com/ekzhang/jax-js.git /tmp/jax-js
-git clone https://github.com/StefanSko/jax-js-mcmc.git /tmp/jax-js-mcmc
+git clone https://github.com/StefanSko/jax-js-mcmc-2.git /tmp/jax-js-mcmc-2
 ```
 
-Refer to /tmp/jax-js/src for:
+Refer to `/tmp/jax-js/src` for:
 - Array API conventions
 - How grad/jit/vmap work
 - Random number generation patterns
@@ -64,6 +67,33 @@ DSL + compile path works.
 - Recommended model: Eight Schools (noncentered)
 - Suggested HMC config: `numSamples: 100`, `numWarmup: 100`, `numChains: 1`, `key: randomKey(0)`
 - Goal: regression signal with loose tolerances, not full posterior precision
+
+## Memory Management (JAX-JS)
+
+- Every array operation consumes its inputs. Use `.ref` if you need to reuse.
+- Ref counts are testable via `x.refCount` and use-after-dispose should throw.
+- See `docs/JAX-JS-MEMORY.md` for patterns and gotchas.
+
+### Mandatory Integration Check (Memory)
+
+When changing HMC wrappers, integrators, or inference loops, run the memory
+profile from `jax-js-mcmc-2`:
+
+```bash
+cd /tmp/jax-js-mcmc-2
+JAXJS_CACHE_LOG=1 NODE_OPTIONS="--expose-gc --loader ./tools/jaxjs-loader.mjs" \
+  ITERATIONS=2000 LOG_EVERY=500 npx tsx examples/memory-profile-hmc-jit-step.ts
+```
+
+**Desired output:** memory should plateau (heap and rss do not trend upward) and
+stay comfortably below ~300MB by the end of 2,000 iterations. If it grows
+monotonically or exceeds ~500MB, treat as a regression.
+
+You can also run it from this repo:
+
+```bash
+pnpm run memory:profile-mcmc2
+```
 
 ## Key Design Decisions
 

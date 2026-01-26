@@ -5,6 +5,7 @@ import { hmc } from "jax-js-mcmc";
 import { model, param, observed, data } from "../../src/index";
 import { normal, halfCauchy } from "../../src/distributions/index";
 import { positive } from "../../src/constraints/index";
+import { disposeHmcResult, logMemory, maybeDisposeTree } from "./memory";
 
 const REF_MEANS = {
   mu: 4.41051833695493,
@@ -26,19 +27,8 @@ const eightSchools = model({
   ),
 });
 
-const eightSchoolsData = {
-  y: np.array([28, 8, -3, 7, -1, 1, 18, 12]),
-  sigma: np.array([15, 10, 16, 11, 9, 11, 10, 18]),
-};
-
-const initialParams = {
-  mu: np.array(0),
-  tau: np.array(0),
-  thetaRaw: np.zeros([8]),
-};
-
 function meanFromDraws(draws: JaxArray): number {
-  const values = draws.js() as number[] | number[][];
+  const values = draws.ref.js() as number[] | number[][];
   let sum = 0;
   let count = 0;
 
@@ -77,6 +67,16 @@ function expectMeanClose(label: string, value: number, ref: number): void {
 
 describe("posteriordb smoke", () => {
   test("eight schools noncentered matches reference means", async () => {
+    logMemory("smoke start: eight schools noncentered");
+    const eightSchoolsData = {
+      y: np.array([28, 8, -3, 7, -1, 1, 18, 12]),
+      sigma: np.array([15, 10, 16, 11, 9, 11, 10, 18]),
+    };
+    const initialParams = {
+      mu: np.array(0),
+      tau: np.array(0),
+      thetaRaw: np.zeros([8]),
+    };
     const bound = eightSchools.bind(eightSchoolsData);
     const result = await hmc(bound.logProb, {
       numSamples: 100,
@@ -91,5 +91,9 @@ describe("posteriordb smoke", () => {
 
     expectMeanClose("mu", muMean, REF_MEANS.mu);
     expectMeanClose("tau", tauMean, REF_MEANS.tau);
+    disposeHmcResult(result);
+    maybeDisposeTree(initialParams, "initialParams");
+    maybeDisposeTree(eightSchoolsData, "data");
+    logMemory("smoke end: eight schools noncentered");
   });
 });

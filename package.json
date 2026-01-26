@@ -26,7 +26,11 @@
     "test:watch": "vitest",
     "test:distributions": "vitest run tests/distributions",
     "test:constraints": "vitest run tests/constraints",
-    "test:posteriordb": "vitest run tests/posteriordb"
+    "test:posteriordb": "vitest run tests/posteriordb",
+    "test:posteriordb:mem": "POSTERIORDB_MEM_LOG=1 POSTERIORDB_MEM_GC=1 POSTERIORDB_MEM_DISPOSE=1 NODE_OPTIONS=\"--expose-gc --max-old-space-size=8192\" vitest run tests/posteriordb",
+    "test:posteriordb:isolated": "bash tools/run-posteriordb-isolated.sh",
+    "memory:repro-hmc": "HMC_MEM_REPRO=1 NODE_OPTIONS=\"--expose-gc --max-old-space-size=4096\" vitest run tests/memory/hmc-repro.test.ts",
+    "memory:profile-mcmc2": "bash tools/run-mcmc2-memory-profile.sh"
   },
   "pnpm": {
     "packageExtensions": {
