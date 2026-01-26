@@ -4,7 +4,7 @@
   "type": "module",
   "license": "MIT",
   "dependencies": {
-    "jax-js-mcmc": "github:StefanSko/jax-js-mcmc"
+    "jax-js-mcmc-2": "github:StefanSko/jax-js-mcmc-2"
   },
   "peerDependencies": {
     "@jax-js/jax": ">=0.1.0",
@@ -30,7 +30,7 @@
   },
   "pnpm": {
     "packageExtensions": {
-      "jax-js-mcmc@*": {
+      "jax-js-mcmc-2@*": {
         "exports": {
           ".": "./src/index.ts"
         },
